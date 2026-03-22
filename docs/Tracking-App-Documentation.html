@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking App - Complete Documentation</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 40px; }
+        h1 { color: #3B5FFF; border-bottom: 2px solid #3B5FFF; padding-bottom: 10px; }
+        h2 { color: #333; margin-top: 30px; }
+        h3 { color: #555; margin-top: 20px; }
+        ul, ol { margin: 10px 0; }
+        li { margin: 5px 0; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        .box { background: #f8f9fa; border-left: 4px solid #3B5FFF; padding: 15px; margin: 15px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #3B5FFF; color: white; }
+    </style>
+</head>
+<body>
+
+<h1>Tracking App - Complete Documentation</h1>
+<p><strong>Last updated:</strong> March 2025</p>
+
+<h2>1. What is This Application?</h2>
+<p>This is a <strong>Tracking Code Manager</strong> application. It allows users to add, edit, and manage JavaScript tracking snippets (like Google Analytics, Facebook Pixel, or other marketing scripts) that run on customer-facing web pages. The key feature is <strong>cookie consent</strong>: tracking scripts only execute when the visitor explicitly accepts cookies.</p>
+
+<h2>2. Main Purpose</h2>
+<ul>
+    <li><strong>Privacy compliance</strong> - Scripts run only when visitors consent</li>
+    <li><strong>Centralized management</strong> - Add, edit, delete tracking codes in one place</li>
+    <li><strong>User ownership</strong> - Each user manages only their own tracking codes</li>
+</ul>
+
+<h2>3. Two Main Areas of the App</h2>
+
+<h3>3.1 Admin Area (Authenticated Users)</h3>
+<p>Routes under authentication: Dashboard, Tracking Codes, Profile.</p>
+<ul>
+    <li><code>/dashboard</code> - User dashboard</li>
+    <li><code>/tracking-codes</code> - List all your tracking codes</li>
+    <li><code>/tracking-codes/create</code> - Add a new tracking code</li>
+    <li><code>/tracking-codes/{id}/edit</code> - Edit an existing tracking code</li>
+</ul>
+<p>Here you manage your tracking scripts: create new ones, edit names and script content, or delete them. Each tracking code has a <strong>Name</strong> (descriptive label) and <strong>Script</strong> (the JavaScript code without &lt;script&gt; tags).</p>
+
+<h3>3.2 Customer Area (Public Visitors)</h3>
+<p>Routes that anyone can visit without logging in:</p>
+<ul>
+    <li><code>/customer</code> - Default customer page (uses first user's tracking codes for demo)</li>
+    <li><code>/customer/{userId}</code> - Customer page for a specific user's site</li>
+</ul>
+<p>When a visitor opens these pages:</p>
+<ol>
+    <li>A <strong>cookie consent banner</strong> appears at the bottom</li>
+    <li>Two buttons: <strong>"Accept all"</strong> or <strong>"Reject all"</strong></li>
+    <li>If Accept: All tracking codes belonging to that page's owner are executed</li>
+    <li>If Reject: No tracking scripts run</li>
+    <li>The choice is stored in localStorage for 30 days (banner won't show again until expiry)</li>
+</ol>
+
+<h2>4. How It Works - Flow Diagram</h2>
+<div class="box">
+<p><strong>Step 1:</strong> You (logged in) go to Settings &gt; Tracking Codes</p>
+<p><strong>Step 2:</strong> You click "Add Tracking Code", enter a name (e.g. "Google Analytics") and paste the JavaScript snippet</p>
+<p><strong>Step 3:</strong> The script is saved to the database, linked to your user account</p>
+<p><strong>Step 4:</strong> A visitor goes to /customer (or /customer/your-id)</p>
+<p><strong>Step 5:</strong> Cookie banner appears: "We use cookies for tracking. [Reject all] [Accept all]"</p>
+<p><strong>Step 6:</strong> If visitor clicks "Accept all" → Your tracking scripts run on the page</p>
+<p><strong>Step 7:</strong> If visitor clicks "Reject all" → No scripts run; banner disappears and won't show again for 30 days</p>
+</div>
+
+<h2>5. Database Structure</h2>
+<table>
+    <tr>
+        <th>Table</th>
+        <th>Columns</th>
+    </tr>
+    <tr>
+        <td>tracking_codes</td>
+        <td>id, user_id, name, script, is_active, created_at, updated_at</td>
+    </tr>
+</table>
+<ul>
+    <li><strong>user_id</strong> - Links the tracking code to the user who created it</li>
+    <li><strong>name</strong> - Descriptive name (e.g. "Google Analytics")</li>
+    <li><strong>script</strong> - The JavaScript code (stored without &lt;script&gt; tags; the app wraps it when executing)</li>
+    <li><strong>is_active</strong> - Whether the script is enabled (default: true)</li>
+</ul>
+
+<h2>6. Technical Stack</h2>
+<ul>
+    <li><strong>Backend:</strong> Laravel 11.x</li>
+    <li><strong>Frontend:</strong> React 18+ with TypeScript/JavaScript</li>
+    <li><strong>Integration:</strong> Inertia.js (Laravel + React)</li>
+    <li><strong>Styling:</strong> Tailwind CSS</li>
+    <li><strong>Icons:</strong> Lucide React</li>
+    <li><strong>Primary Color:</strong> #3B5FFF</li>
+</ul>
+
+<h2>7. Key Components</h2>
+<table>
+    <tr>
+        <th>Component</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>CookieBanner</td>
+        <td>Shows Accept/Reject buttons on customer pages; hides after user chooses</td>
+    </tr>
+    <tr>
+        <td>TrackingScripts</td>
+        <td>Executes tracking code scripts when consent is given</td>
+    </tr>
+    <tr>
+        <td>TrackingCodeFormFields</td>
+        <td>Shared form fields (Name, Script) for Create and Edit pages</td>
+    </tr>
+    <tr>
+        <td>useCookieConsent</td>
+        <td>Hook that manages consent state (localStorage, 30-day expiry)</td>
+    </tr>
+</tr>
+</table>
+
+<h2>8. Routes Summary</h2>
+<table>
+    <tr>
+        <th>Route</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>GET /</td>
+        <td>Welcome / Home page</td>
+    </tr>
+    <tr>
+        <td>GET /dashboard</td>
+        <td>User dashboard (auth required)</td>
+    </tr>
+    <tr>
+        <td>GET /tracking-codes</td>
+        <td>List tracking codes (auth required)</td>
+    </tr>
+    <tr>
+        <td>GET /tracking-codes/create</td>
+        <td>Form to add tracking code (auth required)</td>
+    </tr>
+    <tr>
+        <td>POST /tracking-codes</td>
+        <td>Save new tracking code (auth required)</td>
+    </tr>
+    <tr>
+        <td>GET /tracking-codes/{id}/edit</td>
+        <td>Form to edit tracking code (auth required)</td>
+    </tr>
+    <tr>
+        <td>PUT /tracking-codes/{id}</td>
+        <td>Update tracking code (auth required)</td>
+    </tr>
+    <tr>
+        <td>DELETE /tracking-codes/{id}</td>
+        <td>Delete tracking code (auth required)</td>
+    </tr>
+    <tr>
+        <td>GET /customer</td>
+        <td>Customer page with cookie banner (public)</td>
+    </tr>
+    <tr>
+        <td>GET /customer/{userId}</td>
+        <td>Customer page for specific user's scripts (public)</td>
+    </tr>
+</table>
+
+<h2>9. Security</h2>
+<ul>
+    <li>Only authenticated users can create, edit, or delete tracking codes</li>
+    <li>Users can only edit/delete their own tracking codes (via TrackingCodePolicy)</li>
+    <li>Customer pages are public; no login required</li>
+</ul>
+
+<h2>10. How to Use - Quick Start</h2>
+<ol>
+    <li>Register or log in to the application</li>
+    <li>Go to "Tracking Codes" in the navigation</li>
+    <li>Click "Add Tracking Code"</li>
+    <li>Enter a name (e.g. "Google Analytics")</li>
+    <li>Paste your tracking script (without &lt;script&gt; tags) into the textarea</li>
+    <li>Click Save</li>
+    <li>Open /customer in a new tab (or incognito) to see the customer page</li>
+    <li>Click "Accept all" on the cookie banner - your script will run</li>
+</ol>
+
+<p style="margin-top: 40px; color: #666; font-size: 0.9em;">— End of Documentation —</p>
+
+</body>
+</html>
